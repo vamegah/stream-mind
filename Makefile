@@ -36,3 +36,18 @@ consume-debug:
 
 test-integration:
 	pytest tests/integration/test_kafka_producer.py -v
+
+# Phase 3: API + Dashboard
+api-up:
+	docker compose -f docker-compose.yml -f docker-compose.override.yml up -d api frontend redis-aggregator
+
+api-down:
+	docker compose -f docker-compose.override.yml down api frontend redis-aggregator
+
+dashboard-logs:
+	docker compose logs -f api frontend redis-aggregator
+
+.PHONY: api-up api-down dashboard-logs
+
+all: up api-up
+	@echo "All services started. Access dashboard at http://localhost:5173"
