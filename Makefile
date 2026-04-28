@@ -22,3 +22,17 @@ ps:
 
 # Restart all services
 restart: down up
+
+# ===== Phase 1: Event Producer =====
+simulate:
+	@echo "Starting event simulator at $(or $(RATE),1000) events/sec..."
+	cd services/kafka-producer && python simulator.py --rate $(or $(RATE),1000)
+
+simulate-load:
+	cd services/kafka-producer && ./load_test.sh $(or $(RATE),1000) $(or $(DURATION),60)
+
+consume-debug:
+	cd services/kafka-producer && python consumer_debug.py --topic raw-events
+
+test-integration:
+	pytest tests/integration/test_kafka_producer.py -v

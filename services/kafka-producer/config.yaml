@@ -1,0 +1,18 @@
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topic: "raw-events"
+  producer_conf:
+    acks: 1
+    linger_ms: 10
+    compression_type: snappy
+
+simulation:
+  events_per_second: 1000           # default, can be overridden by CLI
+  event_types: ["play", "pause", "search", "click"]
+  regions: ["US", "EU", "JP", "BR", "IN"]
+  device_types: ["apple_tv", "iphone", "ipad", "mac"]
+  content_pool_size: 200            # number of distinct content_id values
+  user_pool_size: 10000             # number of distinct user_id_token values
+
+fields:
+  timestamp_ms: "auto"               # auto-generated if missing
