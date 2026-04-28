@@ -1,19 +1,35 @@
 version: '3.8'
 
 services:
-  # Redis aggregator (placeholder for Flink)
+  # Replace old aggregator
   redis-aggregator:
-    build: ./services/redis-aggregator
-    container_name: streammind-aggregator
+    profiles: ["legacy"]  # disable by default
+
+  flink-jobmanager:
+    image: streammind-flink:latest
+    container_name: flink-jobmanager
+    ports:
+      - "8081:8081"
+    environment:
+      - JOB_CLASS=com.streammind.flink.TrendingAggregationJob
+      - FLINK_PROPERTIES=jobmanager.rpc.address: flink-jobmanager
     depends_on:
       - kafka
+      - cassandra
       - redis
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - REDIS_HOST=redis
+    command: jobmanager
     volumes:
-      - ./services/redis-aggregator:/app
-    command: python aggregator.py
+      - ./services/flink-jobs/target/flink-jobs-1.0-SNAPSHOT.jar:/opt/flink/usrlib/flink-jobs.jar
+
+  flink-taskmanager:
+    image: streammind-flink:latest
+    container_name: flink-taskmanager
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - FLINK_PROPERTIES=jobmanager.rpc.address: flink-jobmanager
+    command: taskmanager
+    scale: 2
 
   # FastAPI backend
   api:
@@ -41,3 +57,19 @@ services:
       - ./frontend/react-dashboard:/app
       - /app/node_modules
     command: npm run dev -- --host 0.0.0.0
+
+  ai-agent:
+    build: ./services/ai-agent
+    container_name: streammind-ai-agent
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+      - cassandra
+    environment:
+      - REDIS_HOST=redis
+      - CASSANDRA_HOST=cassandra
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./services/ai-agent/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
