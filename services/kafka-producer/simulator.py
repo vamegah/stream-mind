@@ -15,6 +15,12 @@ from faker import Faker
 
 fake = Faker()
 
+# Load salt from env (fallback for local dev)
+SALT = os.getenv('USER_ID_SALT', 'streammind-salt-2025').encode()
+
+def hash_user_id(raw_id: str) -> str:
+    return hashlib.sha256(SALT + raw_id.encode()).hexdigest()
+
 def load_config(config_path="config.yaml"):
     with open(config_path, 'r') as f:
         return yaml.safe_load(f)
@@ -35,7 +41,8 @@ def delivery_report(err, msg):
 def generate_event(config):
     """Generate one random Apple TV event."""
     event_type = random.choice(config['simulation']['event_types'])
-    user_id_token = f"user_{fake.uuid4()}"   # tokenized, no PII
+    raw_user_id = f"user_{fake.uuid4()}"
+    user_id_token = hash_user_id(raw_user_id) # tokenized
     content_id = f"show_{random.randint(1, config['simulation']['content_pool_size'])}"
     region = random.choice(config['simulation']['regions'])
     device_type = random.choice(config['simulation']['device_types'])

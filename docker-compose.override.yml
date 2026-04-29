@@ -1,6 +1,9 @@
 version: '3.8'
 
 services:
+  kafka-producer:
+    environment:
+      - USER_ID_SALT=${USER_ID_SALT}
   # Replace old aggregator
   redis-aggregator:
     profiles: ["legacy"]  # disable by default
@@ -41,6 +44,7 @@ services:
       - redis
     environment:
       - REDIS_HOST=redis
+      - USER_ID_SALT=${USER_ID_SALT}
     volumes:
       - ./services/api/app:/app/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -70,6 +74,7 @@ services:
       - REDIS_HOST=redis
       - CASSANDRA_HOST=cassandra
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - USER_ID_SALT=${USER_ID_SALT}
     volumes:
       - ./services/ai-agent/app:/app/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
