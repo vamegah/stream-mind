@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useMetricsWebSocket } from './hooks/useWebSocket';
+import AnomalyTimeline from './components/AnomalyTimeline';
 
 interface MetricPoint {
   timestamp: number;
@@ -27,12 +28,7 @@ function App() {
     }
   }, [metrics]);
 
-  const connectionStatus = {
-    0: 'Connecting',
-    1: 'Open',
-    2: 'Closing',
-    3: 'Closed',
-  }[readyState];
+  const connectionStatus = ({ 0: 'Connecting', 1: 'Open', 2: 'Closing', 3: 'Closed' } as const)[readyState as keyof { 0: string; 1: string; 2: string; 3: string }];
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
@@ -65,6 +61,7 @@ function App() {
             ))}
           </ul>
         </div>
+        <AnomalyTimeline />
       </div>
     </div>
   );

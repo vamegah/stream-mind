@@ -4,6 +4,8 @@ import redis.asyncio as redis
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from routers import anomalies
+from routers import privacy, user_history
 
 # Global Redis client
 redis_client = None
@@ -18,6 +20,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(anomalies.router)
+
+app.include_router(privacy.router)
 
 app.add_middleware(
     CORSMiddleware,
