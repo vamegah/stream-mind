@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: streammind-api
+  namespace: streammind
+spec:
+  selector:
+    matchLabels:
+      app: api
+  endpoints:
+  - port: web
+    interval: 15s

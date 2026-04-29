@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: streammind
+resources:
+  - namespace.yaml
+  - kafka-cluster.yaml
+  - cassandra-cluster.yaml
+  - redis-deployment.yaml
+  - flink-job.yaml
+  - api-deployment.yaml
+  - ai-agent-deployment.yaml
+  - frontend-deployment.yaml
+  - anomaly-consumer-deployment.yaml
+  - ingress.yaml
+  - servicemonitor.yaml
