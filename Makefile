@@ -51,3 +51,16 @@ dashboard-logs:
 
 all: up api-up
 	@echo "All services started. Access dashboard at http://localhost:5173"
+
+# Chaos & Performance
+chaos-kill:
+	./tests/chaos/kill_random_pod.sh
+
+chaos-flink-recovery:
+	./tests/chaos/flink_recovery_test.sh
+
+locust:
+	locust -f tests/performance/locustfile.py --host http://localhost:8000
+
+latency-test:
+	./tests/performance/validate_latency.sh
